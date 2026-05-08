@@ -22,6 +22,8 @@ function Nav() {
         <a href="#how" className="text-muted-foreground hover:text-foreground">How it works</a>
         <a href="#network" className="text-muted-foreground hover:text-foreground">Network</a>
         <a href="#farmers" className="text-muted-foreground hover:text-foreground">For farmers</a>
+        <a href="#start" className="text-muted-foreground hover:text-foreground">Get started</a>
+        <a href="#stack" className="text-muted-foreground hover:text-foreground">Platform</a>
         <a href="#impact" className="text-muted-foreground hover:text-foreground">Impact</a>
       </nav>
       <div className="flex items-center gap-2">
