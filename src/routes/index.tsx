@@ -424,7 +424,9 @@ function Landing() {
       <HowItWorks />
       <Network />
       <Farmers />
+      <GetStarted />
       <Impact />
+      <Stack />
       <CTA />
       <Footer />
     </div>
