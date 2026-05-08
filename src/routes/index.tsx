@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowUpRight, Leaf, Truck, Snowflake, MapPin, Sun, ShoppingBasket } from "lucide-react";
+import { useState } from "react";
+import { ArrowUpRight, Leaf, Truck, Snowflake, MapPin, Sun, ShoppingBasket, Database, Shield, Cloud, Zap, Sprout, ShoppingBag } from "lucide-react";
 import heroFarmer from "@/assets/hero-farmer.jpg";
 import produce from "@/assets/produce-flatlay.jpg";
 import coldChain from "@/assets/cold-chain.jpg";
@@ -21,6 +22,8 @@ function Nav() {
         <a href="#how" className="text-muted-foreground hover:text-foreground">How it works</a>
         <a href="#network" className="text-muted-foreground hover:text-foreground">Network</a>
         <a href="#farmers" className="text-muted-foreground hover:text-foreground">For farmers</a>
+        <a href="#start" className="text-muted-foreground hover:text-foreground">Get started</a>
+        <a href="#stack" className="text-muted-foreground hover:text-foreground">Platform</a>
         <a href="#impact" className="text-muted-foreground hover:text-foreground">Impact</a>
       </nav>
       <div className="flex items-center gap-2">
@@ -221,6 +224,151 @@ function Impact() {
   );
 }
 
+const DISTRICTS = [
+  "Kigali · Nyarugenge",
+  "Kigali · Gasabo",
+  "Kigali · Kicukiro",
+  "Musanze · Northern",
+  "Rubavu · Western",
+  "Huye · Southern",
+  "Nyagatare · Eastern",
+  "Karongi · Western",
+  "Muhanga · Southern",
+];
+
+function GetStarted() {
+  const [role, setRole] = useState<"customer" | "farmer">("customer");
+  const [district, setDistrict] = useState(DISTRICTS[0]);
+  const [village, setVillage] = useState("");
+
+  const isCustomer = role === "customer";
+
+  return (
+    <section id="start" className="container-x py-24">
+      <div className="grid gap-10 lg:grid-cols-12">
+        <div className="lg:col-span-5">
+          <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">Get started</p>
+          <h2 className="mt-3 text-4xl md:text-5xl">Tell us who you are <br />and where you grow or eat.</h2>
+          <p className="mt-5 max-w-md text-muted-foreground">
+            Soko routes orders along the shortest cold-chain path between rural farms and urban kitchens. Pick your role and location to see hubs near you.
+          </p>
+        </div>
+
+        <div className="rounded-3xl border border-border bg-card p-8 shadow-soft lg:col-span-7">
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { id: "customer", label: "I'm a customer", desc: "Order weekly harvest boxes", Icon: ShoppingBag },
+              { id: "farmer", label: "I'm a farmer", desc: "List & sell my produce", Icon: Sprout },
+            ].map((r) => {
+              const active = role === r.id;
+              return (
+                <button
+                  key={r.id}
+                  onClick={() => setRole(r.id as "customer" | "farmer")}
+                  className={`group relative rounded-2xl border p-5 text-left transition ${
+                    active
+                      ? "border-foreground bg-foreground text-background"
+                      : "border-border bg-background hover:border-foreground/40"
+                  }`}
+                >
+                  <span className={`grid h-10 w-10 place-items-center rounded-xl ${active ? "bg-background/10" : "bg-primary/10 text-primary"}`}>
+                    <r.Icon className="h-5 w-5" />
+                  </span>
+                  <div className="mt-4 font-medium">{r.label}</div>
+                  <div className={`mt-1 text-sm ${active ? "text-background/70" : "text-muted-foreground"}`}>{r.desc}</div>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <label className="block">
+              <span className="text-xs uppercase tracking-wider text-muted-foreground">
+                {isCustomer ? "Delivery district" : "Farm district"}
+              </span>
+              <div className="mt-2 flex items-center gap-2 rounded-xl border border-border bg-background px-3 py-2.5">
+                <MapPin className="h-4 w-4 text-muted-foreground" />
+                <select
+                  value={district}
+                  onChange={(e) => setDistrict(e.target.value)}
+                  className="w-full bg-transparent text-sm outline-none"
+                >
+                  {DISTRICTS.map((d) => (
+                    <option key={d}>{d}</option>
+                  ))}
+                </select>
+              </div>
+            </label>
+
+            <label className="block">
+              <span className="text-xs uppercase tracking-wider text-muted-foreground">
+                {isCustomer ? "Neighborhood / street" : "Village / sector"}
+              </span>
+              <div className="mt-2 flex items-center gap-2 rounded-xl border border-border bg-background px-3 py-2.5">
+                <Sprout className="h-4 w-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  value={village}
+                  onChange={(e) => setVillage(e.target.value)}
+                  placeholder={isCustomer ? "e.g. Kimihurura" : "e.g. Kinigi sector"}
+                  className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground/60"
+                />
+              </div>
+            </label>
+          </div>
+
+          <div className="mt-6 flex items-center justify-between rounded-2xl bg-muted px-4 py-3 text-sm">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <span className="h-1.5 w-1.5 rounded-full bg-leaf" />
+              Nearest hub: <span className="font-medium text-foreground">{district.split(" · ")[0]} Hub</span>
+            </div>
+            <span className="text-muted-foreground">~14 hr to delivery</span>
+          </div>
+
+          <button className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3.5 text-sm font-medium text-primary-foreground hover:opacity-95">
+            {isCustomer ? "Continue to the market" : "Continue as a farmer"} <ArrowUpRight className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Stack() {
+  const items = [
+    { Icon: Cloud, title: "Lovable Cloud", desc: "Managed backend powering auth, APIs and edge logic — no server to babysit." },
+    { Icon: Database, title: "Postgres database", desc: "Relational store for farms, harvests, orders and cold-chain telemetry." },
+    { Icon: Shield, title: "Row-level security", desc: "Per-role policies keep farmers, customers and admins in their own lane." },
+    { Icon: Zap, title: "Realtime + AI ready", desc: "Live order tracking and a built-in AI gateway for forecasting demand." },
+  ];
+  return (
+    <section id="stack" className="container-x py-24">
+      <div className="rounded-3xl border border-border bg-cream p-10 md:p-14">
+        <div className="grid gap-10 lg:grid-cols-12">
+          <div className="lg:col-span-5">
+            <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">The platform</p>
+            <h2 className="mt-3 text-4xl md:text-5xl">A backend you can <em className="not-italic text-leaf">actually</em> build on.</h2>
+            <p className="mt-5 max-w-md text-muted-foreground">
+              Soko runs on Lovable Cloud — a fully managed backend with a Postgres database, authentication, file storage and edge functions. Customers, farmers and operators all read and write through the same secure API.
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:col-span-7">
+            {items.map((i) => (
+              <div key={i.title} className="rounded-2xl border border-border bg-card p-6">
+                <span className="grid h-11 w-11 place-items-center rounded-xl bg-leaf/15 text-leaf">
+                  <i.Icon className="h-5 w-5" />
+                </span>
+                <h3 className="mt-5 text-lg">{i.title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">{i.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function CTA() {
   return (
     <section className="container-x pb-24">
@@ -276,7 +424,9 @@ function Landing() {
       <HowItWorks />
       <Network />
       <Farmers />
+      <GetStarted />
       <Impact />
+      <Stack />
       <CTA />
       <Footer />
     </div>
