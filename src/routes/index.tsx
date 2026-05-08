@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowUpRight, Leaf, Truck, Snowflake, MapPin, Sun, ShoppingBasket } from "lucide-react";
+import { useState } from "react";
+import { ArrowUpRight, Leaf, Truck, Snowflake, MapPin, Sun, ShoppingBasket, Database, Shield, Cloud, Zap, Sprout, ShoppingBag } from "lucide-react";
 import heroFarmer from "@/assets/hero-farmer.jpg";
 import produce from "@/assets/produce-flatlay.jpg";
 import coldChain from "@/assets/cold-chain.jpg";
