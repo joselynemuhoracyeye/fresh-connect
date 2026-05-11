@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState, useRef } from "react";
-import { Leaf, Plus, LogOut, ImagePlus, Trash2, MapPin, ShoppingBasket } from "lucide-react";
+import { useEffect, useState, useRef, useMemo } from "react";
+import { Leaf, Plus, LogOut, ImagePlus, Trash2, MapPin, ShoppingBasket, Search, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
