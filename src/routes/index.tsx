@@ -27,10 +27,10 @@ function Nav() {
         <a href="#impact" className="text-muted-foreground hover:text-foreground">Impact</a>
       </nav>
       <div className="flex items-center gap-2">
-        <button className="hidden rounded-full px-4 py-2 text-sm text-foreground hover:bg-muted md:inline-flex">Sign in</button>
-        <button className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-4 py-2 text-sm text-background hover:opacity-90">
+        <Link to="/login" className="hidden rounded-full px-4 py-2 text-sm text-foreground hover:bg-muted md:inline-flex">Sign in</Link>
+        <Link to="/signup" className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-4 py-2 text-sm text-background hover:opacity-90">
           Start ordering <ArrowUpRight className="h-3.5 w-3.5" />
-        </button>
+        </Link>
       </div>
     </header>
   );
