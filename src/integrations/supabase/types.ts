@@ -14,7 +14,81 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      products: {
+        Row: {
+          created_at: string
+          description: string | null
+          district: string | null
+          id: string
+          image_url: string | null
+          owner_id: string
+          price_rwf: number | null
+          title: string
+          unit: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          district?: string | null
+          id?: string
+          image_url?: string | null
+          owner_id: string
+          price_rwf?: number | null
+          title: string
+          unit?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          district?: string | null
+          id?: string
+          image_url?: string | null
+          owner_id?: string
+          price_rwf?: number | null
+          title?: string
+          unit?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          district: string | null
+          id: string
+          phone: string | null
+          updated_at: string
+          username: string
+          village: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          district?: string | null
+          id: string
+          phone?: string | null
+          updated_at?: string
+          username: string
+          village?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          district?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          username?: string
+          village?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
