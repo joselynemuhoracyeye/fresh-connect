@@ -110,25 +110,7 @@ function Dashboard() {
           </div>
         </div>
 
-        <h2 className="mt-12 font-display text-2xl">Today's harvest</h2>
-        <p className="text-sm text-muted-foreground">Fresh produce posted by farmers in the network.</p>
-
-        {!loaded ? (
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((i) => <div key={i} className="h-72 animate-pulse rounded-2xl bg-muted" />)}
-          </div>
-        ) : feed.length === 0 ? (
-          <div className="mt-6 grid place-items-center rounded-2xl border border-dashed border-border bg-card py-16">
-            <ShoppingBasket className="h-8 w-8 text-muted-foreground" />
-            <p className="mt-3 text-sm text-muted-foreground">No produce posted yet. Be the first!</p>
-          </div>
-        ) : (
-          <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {feed.map((p) => (
-              <ProductCard key={p.id} p={p} owned={p.owner_id === user.id} onDelete={loadAll} />
-            ))}
-          </div>
-        )}
+        <MarketFeed feed={feed} loaded={loaded} userId={user.id} onChange={loadAll} />
 
         <div className="h-20" />
       </section>
