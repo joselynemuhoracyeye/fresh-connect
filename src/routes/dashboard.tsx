@@ -127,15 +127,117 @@ function Stat({ label, value }: { label: string; value: number }) {
   );
 }
 
+function MarketFeed({
+  feed, loaded, userId, onChange,
+}: { feed: Product[]; loaded: boolean; userId: string; onChange: () => void }) {
+  const [q, setQ] = useState("");
+  const [district, setDistrict] = useState("all");
+  const [sort, setSort] = useState<"new" | "low" | "high">("new");
+
+  const districts = useMemo(() => {
+    const set = new Set<string>();
+    feed.forEach((p) => p.district && set.add(p.district));
+    return Array.from(set).sort();
+  }, [feed]);
+
+  const filtered = useMemo(() => {
+    let out = feed;
+    if (q.trim()) {
+      const needle = q.toLowerCase();
+      out = out.filter(
+        (p) =>
+          p.title.toLowerCase().includes(needle) ||
+          (p.description ?? "").toLowerCase().includes(needle),
+      );
+    }
+    if (district !== "all") out = out.filter((p) => p.district === district);
+    if (sort === "low") out = [...out].sort((a, b) => (a.price_rwf ?? Infinity) - (b.price_rwf ?? Infinity));
+    if (sort === "high") out = [...out].sort((a, b) => (b.price_rwf ?? -1) - (a.price_rwf ?? -1));
+    return out;
+  }, [feed, q, district, sort]);
+
+  return (
+    <>
+      <div className="mt-12 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="font-display text-2xl">Today's harvest</h2>
+          <p className="text-sm text-muted-foreground">
+            {loaded ? `${filtered.length} of ${feed.length} listings` : "Loading the market..."}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-card p-3 shadow-soft">
+        <div className="relative min-w-[200px] flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search avocados, beans, milk..."
+            className="pl-9 pr-9"
+          />
+          {q && (
+            <button onClick={() => setQ("")} className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground hover:bg-muted">
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
+        <select
+          value={district}
+          onChange={(e) => setDistrict(e.target.value)}
+          className="h-9 rounded-md border border-input bg-transparent px-3 text-sm"
+        >
+          <option value="all">All districts</option>
+          {districts.map((d) => <option key={d}>{d}</option>)}
+        </select>
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value as "new" | "low" | "high")}
+          className="h-9 rounded-md border border-input bg-transparent px-3 text-sm"
+        >
+          <option value="new">Newest</option>
+          <option value="low">Price: low to high</option>
+          <option value="high">Price: high to low</option>
+        </select>
+      </div>
+
+      {!loaded ? (
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => <div key={i} className="h-72 animate-pulse rounded-2xl bg-muted" />)}
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="mt-6 grid place-items-center rounded-2xl border border-dashed border-border bg-card py-16">
+          <ShoppingBasket className="h-8 w-8 text-muted-foreground" />
+          <p className="mt-3 text-sm text-muted-foreground">
+            {feed.length === 0 ? "No produce posted yet. Be the first!" : "No listings match your filters."}
+          </p>
+        </div>
+      ) : (
+        <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((p) => (
+            <ProductCard key={p.id} p={p} owned={p.owner_id === userId} onDelete={onChange} />
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
 function ProductCard({ p, owned, onDelete }: { p: Product; owned: boolean; onDelete: () => void }) {
-  const remove = async () => {
+  const remove = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (!confirm("Delete this listing?")) return;
     const { error } = await supabase.from("products").delete().eq("id", p.id);
     if (error) toast.error(error.message);
     else { toast.success("Removed"); onDelete(); }
   };
   return (
-    <article className="group overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
+    <Link
+      to="/product/$id"
+      params={{ id: p.id }}
+      className="group block overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition hover:shadow-lg"
+    >
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         {p.image_url ? (
           <img src={p.image_url} alt={p.title} className="h-full w-full object-cover transition group-hover:scale-105" />
@@ -164,7 +266,7 @@ function ProductCard({ p, owned, onDelete }: { p: Product; owned: boolean; onDel
           </div>
         )}
       </div>
-    </article>
+    </Link>
   );
 }
 
