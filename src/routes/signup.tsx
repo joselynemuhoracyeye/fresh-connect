@@ -11,9 +11,27 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/signup")({ component: SignupPage });
 
-const DISTRICTS = ["Kigali", "Musanze", "Huye", "Rubavu", "Nyagatare", "Karongi", "Muhanga", "Rwamagana", "Other"];
+const DISTRICTS = [
+  "Kigali",
+  "Musanze",
+  "Huye",
+  "Rubavu",
+  "Nyagatare",
+  "Karongi",
+  "Muhanga",
+  "Rwamagana",
+  "Other",
+];
 
-const COMMON_PASSWORD_PARTS = ["password", "qwerty", "123456", "123456789", "soko", "admin", "welcome"];
+const COMMON_PASSWORD_PARTS = [
+  "password",
+  "qwerty",
+  "123456",
+  "123456789",
+  "soko",
+  "admin",
+  "welcome",
+];
 
 const getPasswordIssues = (value: string) => {
   const lower = value.toLowerCase();
@@ -24,7 +42,8 @@ const getPasswordIssues = (value: string) => {
   if (!/[a-z]/.test(value)) issues.push("Add a lowercase letter");
   if (!/\d/.test(value)) issues.push("Add a number");
   if (!/[^A-Za-z0-9]/.test(value)) issues.push("Add a symbol");
-  if (COMMON_PASSWORD_PARTS.some((part) => lower.includes(part))) issues.push("Avoid common words or number patterns");
+  if (COMMON_PASSWORD_PARTS.some((part) => lower.includes(part)))
+    issues.push("Avoid common words or number patterns");
 
   return issues;
 };
@@ -53,20 +72,28 @@ function SignupPage() {
             <span className="font-display text-xl">Soko</span>
           </Link>
           <h1 className="mt-6 font-display text-3xl">Create your account</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Join the harvest network in under a minute.</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Join the harvest network in under a minute.
+          </p>
 
           <Tabs defaultValue="username" className="mt-6">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="username">Username</TabsTrigger>
               <TabsTrigger value="phone">Phone</TabsTrigger>
             </TabsList>
-            <TabsContent value="username" className="mt-4"><UsernameSignup /></TabsContent>
-            <TabsContent value="phone" className="mt-4"><PhoneSignup /></TabsContent>
+            <TabsContent value="username" className="mt-4">
+              <UsernameSignup />
+            </TabsContent>
+            <TabsContent value="phone" className="mt-4">
+              <PhoneSignup />
+            </TabsContent>
           </Tabs>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link to="/login" className="font-medium text-primary hover:underline">Sign in</Link>
+            <Link to="/login" className="font-medium text-primary hover:underline">
+              Sign in
+            </Link>
           </p>
         </div>
       </div>
@@ -100,7 +127,12 @@ function UsernameSignup() {
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/dashboard`,
-        data: { username: username.toLowerCase().trim(), display_name: username, district, village },
+        data: {
+          username: username.toLowerCase().trim(),
+          display_name: username,
+          district,
+          village,
+        },
       },
     });
     setBusy(false);
@@ -111,8 +143,7 @@ function UsernameSignup() {
           ? "Try the suggested password, or use a longer password with uppercase, lowercase, numbers, and symbols."
           : error.message,
       });
-    }
-    else toast.success("Account created");
+    } else toast.success("Account created");
   };
 
   return (
@@ -123,7 +154,14 @@ function UsernameSignup() {
       </div>
       <div>
         <Label htmlFor="p">Password</Label>
-        <Input id="p" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={10} />
+        <Input
+          id="p"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          minLength={10}
+        />
         <div className="mt-2 flex items-start justify-between gap-3">
           <p className="text-xs text-muted-foreground">
             Use 12+ characters with upper/lower case, a number, and a symbol.
@@ -149,8 +187,15 @@ function UsernameSignup() {
       <div className="grid grid-cols-2 gap-3">
         <div>
           <Label htmlFor="d">District</Label>
-          <select id="d" value={district} onChange={(e) => setDistrict(e.target.value)} className="mt-1 h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm">
-            {DISTRICTS.map((d) => <option key={d}>{d}</option>)}
+          <select
+            id="d"
+            value={district}
+            onChange={(e) => setDistrict(e.target.value)}
+            className="mt-1 h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"
+          >
+            {DISTRICTS.map((d) => (
+              <option key={d}>{d}</option>
+            ))}
           </select>
         </div>
         <div>
@@ -158,7 +203,11 @@ function UsernameSignup() {
           <Input id="v" value={village} onChange={(e) => setVillage(e.target.value)} />
         </div>
       </div>
-      <Button type="submit" disabled={busy || passwordIssues.length > 0} className="w-full rounded-full bg-primary">
+      <Button
+        type="submit"
+        disabled={busy || passwordIssues.length > 0}
+        className="w-full rounded-full bg-primary"
+      >
         {busy ? "Creating..." : "Create account"} <ArrowRight className="ml-1 h-4 w-4" />
       </Button>
     </form>
@@ -181,7 +230,10 @@ function PhoneSignup() {
     });
     setBusy(false);
     if (error) toast.error("Could not send code", { description: error.message });
-    else { toast.success("Code sent"); setStage("code"); }
+    else {
+      toast.success("Code sent");
+      setStage("code");
+    }
   };
 
   const verify = async (e: React.FormEvent) => {
@@ -200,7 +252,14 @@ function PhoneSignup() {
       </div>
       <div>
         <Label htmlFor="ph2">Phone (with country code)</Label>
-        <Input id="ph2" type="tel" placeholder="+250 78 ..." value={phone} onChange={(e) => setPhone(e.target.value)} required />
+        <Input
+          id="ph2"
+          type="tel"
+          placeholder="+250 78 ..."
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          required
+        />
       </div>
       <Button type="submit" disabled={busy} className="w-full rounded-full bg-primary">
         {busy ? "Sending..." : "Send code"}
@@ -211,7 +270,14 @@ function PhoneSignup() {
     <form onSubmit={verify} className="space-y-4">
       <div>
         <Label htmlFor="otp2">6-digit code</Label>
-        <Input id="otp2" inputMode="numeric" maxLength={6} value={code} onChange={(e) => setCode(e.target.value)} required />
+        <Input
+          id="otp2"
+          inputMode="numeric"
+          maxLength={6}
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          required
+        />
       </div>
       <Button type="submit" disabled={busy} className="w-full rounded-full bg-primary">
         {busy ? "Verifying..." : "Verify"}
