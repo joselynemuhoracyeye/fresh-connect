@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { Leaf, ArrowRight } from "lucide-react";
+import { Leaf, ArrowRight, Wand2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, usernameToEmail } from "@/lib/auth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,6 +12,28 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/signup")({ component: SignupPage });
 
 const DISTRICTS = ["Kigali", "Musanze", "Huye", "Rubavu", "Nyagatare", "Karongi", "Muhanga", "Rwamagana", "Other"];
+
+const COMMON_PASSWORD_PARTS = ["password", "qwerty", "123456", "123456789", "soko", "admin", "welcome"];
+
+const getPasswordIssues = (value: string) => {
+  const lower = value.toLowerCase();
+  const issues: string[] = [];
+
+  if (value.length < 12) issues.push("Use at least 12 characters");
+  if (!/[A-Z]/.test(value)) issues.push("Add an uppercase letter");
+  if (!/[a-z]/.test(value)) issues.push("Add a lowercase letter");
+  if (!/\d/.test(value)) issues.push("Add a number");
+  if (!/[^A-Za-z0-9]/.test(value)) issues.push("Add a symbol");
+  if (COMMON_PASSWORD_PARTS.some((part) => lower.includes(part))) issues.push("Avoid common words or number patterns");
+
+  return issues;
+};
+
+const makeStrongPassword = () => {
+  const array = new Uint32Array(4);
+  crypto.getRandomValues(array);
+  return `Harvest!${array[0].toString(36).slice(0, 4)}Leaf${array[1].toString(36).slice(0, 4)}9#`;
+};
 
 function SignupPage() {
   const { user } = useAuth();
@@ -58,6 +80,7 @@ function UsernameSignup() {
   const [district, setDistrict] = useState(DISTRICTS[0]);
   const [village, setVillage] = useState("");
   const [busy, setBusy] = useState(false);
+  const passwordIssues = getPasswordIssues(password);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,9 +88,9 @@ function UsernameSignup() {
       toast.error("Username must be 3–20 letters, numbers, or _");
       return;
     }
-    if (password.length < 10 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password)) {
+    if (passwordIssues.length > 0) {
       toast.error("Choose a stronger password", {
-        description: "Use at least 10 characters with upper, lower case letters and a number. Avoid common passwords like 'password123'.",
+        description: passwordIssues[0],
       });
       return;
     }
@@ -81,7 +104,14 @@ function UsernameSignup() {
       },
     });
     setBusy(false);
-    if (error) toast.error("Sign up failed", { description: error.message });
+    if (error) {
+      const weakPassword = /weak|guess|password/i.test(error.message);
+      toast.error(weakPassword ? "Choose a stronger password" : "Sign up failed", {
+        description: weakPassword
+          ? "Try the suggested password, or use a longer password with uppercase, lowercase, numbers, and symbols."
+          : error.message,
+      });
+    }
     else toast.success("Account created");
   };
 
@@ -94,9 +124,27 @@ function UsernameSignup() {
       <div>
         <Label htmlFor="p">Password</Label>
         <Input id="p" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={10} />
-        <p className="mt-1 text-xs text-muted-foreground">
-          At least 10 characters, mixing upper/lower case and a number. Avoid leaked passwords (e.g. "password", "qwerty123").
-        </p>
+        <div className="mt-2 flex items-start justify-between gap-3">
+          <p className="text-xs text-muted-foreground">
+            Use 12+ characters with upper/lower case, a number, and a symbol.
+          </p>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-auto shrink-0 px-2 py-1 text-xs"
+            onClick={() => setPassword(makeStrongPassword())}
+          >
+            <Wand2 className="h-3 w-3" /> Suggest
+          </Button>
+        </div>
+        {password && passwordIssues.length > 0 && (
+          <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+            {passwordIssues.map((issue) => (
+              <li key={issue}>• {issue}</li>
+            ))}
+          </ul>
+        )}
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
@@ -110,7 +158,7 @@ function UsernameSignup() {
           <Input id="v" value={village} onChange={(e) => setVillage(e.target.value)} />
         </div>
       </div>
-      <Button type="submit" disabled={busy} className="w-full rounded-full bg-primary">
+      <Button type="submit" disabled={busy || passwordIssues.length > 0} className="w-full rounded-full bg-primary">
         {busy ? "Creating..." : "Create account"} <ArrowRight className="ml-1 h-4 w-4" />
       </Button>
     </form>
