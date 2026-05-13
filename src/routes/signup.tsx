@@ -93,7 +93,10 @@ function UsernameSignup() {
       </div>
       <div>
         <Label htmlFor="p">Password</Label>
-        <Input id="p" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
+        <Input id="p" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={10} />
+        <p className="mt-1 text-xs text-muted-foreground">
+          At least 10 characters, mixing upper/lower case and a number. Avoid leaked passwords (e.g. "password", "qwerty123").
+        </p>
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
