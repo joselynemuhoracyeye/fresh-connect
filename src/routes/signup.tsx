@@ -65,6 +65,12 @@ function UsernameSignup() {
       toast.error("Username must be 3–20 letters, numbers, or _");
       return;
     }
+    if (password.length < 10 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password)) {
+      toast.error("Choose a stronger password", {
+        description: "Use at least 10 characters with upper, lower case letters and a number. Avoid common passwords like 'password123'.",
+      });
+      return;
+    }
     setBusy(true);
     const { error } = await supabase.auth.signUp({
       email: usernameToEmail(username),
@@ -87,7 +93,10 @@ function UsernameSignup() {
       </div>
       <div>
         <Label htmlFor="p">Password</Label>
-        <Input id="p" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
+        <Input id="p" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={10} />
+        <p className="mt-1 text-xs text-muted-foreground">
+          At least 10 characters, mixing upper/lower case and a number. Avoid leaked passwords (e.g. "password", "qwerty123").
+        </p>
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
