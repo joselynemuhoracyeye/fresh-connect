@@ -65,6 +65,12 @@ function UsernameSignup() {
       toast.error("Username must be 3–20 letters, numbers, or _");
       return;
     }
+    if (password.length < 10 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password)) {
+      toast.error("Choose a stronger password", {
+        description: "Use at least 10 characters with upper, lower case letters and a number. Avoid common passwords like 'password123'.",
+      });
+      return;
+    }
     setBusy(true);
     const { error } = await supabase.auth.signUp({
       email: usernameToEmail(username),
